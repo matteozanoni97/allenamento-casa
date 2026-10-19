@@ -80,3 +80,17 @@ test('player: segnali', () => {
   const h = p.state(181 * s)
   assert.ok(p.cues(g, h).some((x) => x.kind === 'fine'))
 })
+
+test('player: fine blocco all\'inizio della pausa tra i blocchi (codex #5)', () => {
+  const steps = [
+    T('blocco', 30, 'squat', { blocco: 1 }), { fase: 'pausa', tipo: 'tempo', sec: 120, blocco: 1, giro: 1 },
+    T('blocco', 30, 'piegamenti', { blocco: 2 }), T('defaticamento', 30, 'stretch-cobra'),
+  ]
+  const p = createPlayer(steps, 0)
+  const entraPausa = p.cues(p.state(29.9 * s), p.state(30.1 * s))
+  assert.ok(entraPausa.some((x) => x.kind === 'fineBlocco'), JSON.stringify(entraPausa))
+  const escePausa = p.cues(p.state(149.9 * s), p.state(150.1 * s))
+  assert.ok(!escePausa.some((x) => x.kind === 'fineBlocco'), JSON.stringify(escePausa))
+  const fine = p.cues(p.state(179.9 * s), p.state(180.1 * s))
+  assert.ok(fine.some((x) => x.kind === 'fineBlocco'))
+})

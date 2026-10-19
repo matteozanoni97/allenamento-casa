@@ -62,6 +62,7 @@ legend { font-weight: 600; margin-bottom: 8px; }
 .ex-list li { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--line); }
 .ex-list select { min-height: 40px; border: 1px solid var(--line); border-radius: 4px; background: var(--white); }
 
+.notice { margin: 16px 0 0; padding: 10px 14px; border-left: 3px solid #b3261e; background: #fdecea; color: #5c1410; border-radius: 0 4px 4px 0; }
 .preview { margin-top: 20px; background: var(--warm); border-left: 3px solid var(--orange); padding: 12px 14px; border-radius: 0 4px 4px 0; }
 .preview h3 { margin: 0 0 4px; font-size: 18px; }
 .preview .phases { font-family: var(--mono); font-size: 14px; color: var(--ink-2); margin: 0 0 8px; font-variant-numeric: tabular-nums; }

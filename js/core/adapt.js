@@ -5,7 +5,6 @@ import { RULES } from './rules.js'
 import { byId } from './catalog.js'
 
 const clamp = (l) => Math.min(RULES.LEVEL_MAX, Math.max(RULES.LEVEL_MIN, l))
-const FORZA = ['gambe', 'anca', 'spinta', 'trazione']
 
 export function defaultLevels() {
   const l = { generale: RULES.LEVEL_START, streak: {} }
@@ -51,12 +50,17 @@ export function applyVote(levels, session, voto, saltati) {
       }
     }
   }
+  // Ogni sessione con i manubri consuma una sessione di prudenza.
+  if ((out.manubriPrudenza ?? 0) > 0 && session.esercizi.some((id) => byId(id)?.attrezzo === 'manubri')) {
+    out.manubriPrudenza -= 1
+  }
   return out
 }
 
-// Manubri piu' pesanti: i movimenti di forza ripartono da una stima prudente.
+// Manubri piu' pesanti: per qualche sessione coi manubri il formato riparte prudente
+// (vedi generator). Corpo libero e trave non cambiano.
 export function onWeightChange(levels, oldKg, newKg) {
   const out = { ...levels, streak: { ...levels.streak } }
-  if (newKg > oldKg) for (const m of FORZA) out[m] = clamp(out[m] - 2)
+  if (newKg > oldKg) out.manubriPrudenza = RULES.WEIGHT_CAUTION_SESSIONS
   return out
 }

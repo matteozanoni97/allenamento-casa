@@ -105,7 +105,10 @@ export function createPlayer(steps, nowMs) {
     if (cur.index !== prev.index) {
       const a = prev.step
       const b = cur.step
-      if (a && MAIN.has(a.fase) && (!MAIN.has(b.fase) || b.blocco !== a.blocco)) out.push({ kind: 'fineBlocco' })
+      // Fine blocco: all'inizio della pausa che lo chiude, oppure uscendo dal circuito.
+      const dopo = steps[cur.index + 1]
+      const pausaFinale = b.fase === 'pausa' && (!dopo || !MAIN.has(dopo.fase) || dopo.blocco !== b.blocco)
+      if (pausaFinale || (a && a.fase === 'blocco' && !MAIN.has(b.fase))) out.push({ kind: 'fineBlocco' })
       const poi = nextName(cur.index)
       out.push({ kind: 'annuncia', text: poi ? `${describe(b)}. poi: ${poi}` : describe(b) })
       return out

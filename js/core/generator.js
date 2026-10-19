@@ -4,7 +4,7 @@
 
 import { RULES } from './rules.js'
 import { CATALOG, byId } from './catalog.js'
-import { FORMATS } from './formats.js'
+import { FORMATS, estimateSec } from './formats.js'
 import { createRng } from './rng.js'
 
 // Sequenze di movimenti per il blocco: mai due uguali vicini, anche a giro chiuso.
@@ -53,7 +53,7 @@ function order(list) {
   return out
 }
 
-function chooseBlock({ rng, allowed, levelOf, focus, includi, recent, skipped }) {
+function chooseBlock({ rng, allowed, allowedSenzaEsclusioni, levelOf, focus, includi, recent, skipped }) {
   const seq = FOCUS[focus] ?? FOCUS.tutto
   const offset = rng.int(0, seq.length - 1)
   const slots = seq.map((_, i) => seq[(i + offset) % seq.length])
@@ -84,7 +84,29 @@ function chooseBlock({ rng, allowed, levelOf, focus, includi, recent, skipped })
     chosen.push(e)
     used.add(e.id)
   }
-  return order(chosen)
+
+  // Esclusioni o focus stretti possono lasciare pochi esercizi: si completa fino a
+  // MIN_BLOCK con altri esercizi ammessi, preferendo quelli non recenti.
+  const fill = (ok) => {
+    const extra = CATALOG.filter((e) => e.ruolo === 'blocco' && !used.has(e.id) && ok(e)
+      && e.gradino <= RULES.GRADINO_MAX(levelOf(e.movimento)))
+    const pref = [extra.filter((e) => !recent.has(e.id) && !skipped.has(e.id)), extra]
+    for (const lista of pref) {
+      for (const e of rng.shuffle(lista)) {
+        if (chosen.length >= RULES.MIN_BLOCK) return
+        if (used.has(e.id)) continue
+        chosen.push(e)
+        used.add(e.id)
+      }
+    }
+  }
+  fill(allowed)
+  let avviso
+  if (chosen.length < 2) {
+    fill(allowedSenzaEsclusioni)
+    avviso = 'Troppi esercizi esclusi: ne ho ripresi alcuni per completare il circuito.'
+  }
+  return { block: order(chosen), avviso }
 }
 
 function timed(fase, ids, sec) {
@@ -133,13 +155,13 @@ export function generateSession(input) {
   const levelOf = (m) => clamp((levels[m] ?? RULES.LEVEL_START) + delta)
   const escludi = new Set(pers.escludi ?? [])
 
-  const allowed = (e) => (e.attrezzo === 'corpo' || (e.attrezzo === 'manubri' && attrezzi.manubri) || (e.attrezzo === 'trave' && attrezzi.trave))
+  const allowedSenzaEsclusioni = (e) => (e.attrezzo === 'corpo' || (e.attrezzo === 'manubri' && attrezzi.manubri) || (e.attrezzo === 'trave' && attrezzi.trave))
     && !(pers.senzaSalti && e.salto)
-    && !escludi.has(e.id)
+  const allowed = (e) => allowedSenzaEsclusioni(e) && !escludi.has(e.id)
 
   const recent = new Set(history.slice(0, RULES.RECENT_SESSIONS_AVOID).flatMap((h) => h.esercizi ?? []))
-  const block = chooseBlock({
-    rng, allowed, levelOf, focus: pers.focus ?? 'tutto', includi: pers.includi ?? [], recent, skipped: skippedOften(history),
+  const { block, avviso } = chooseBlock({
+    rng, allowed, allowedSenzaEsclusioni, levelOf, focus: pers.focus ?? 'tutto', includi: pers.includi ?? [], recent, skipped: skippedOften(history),
   })
 
   const dinamici = block.filter((e) => !e.isometrico).length
@@ -148,8 +170,25 @@ export function generateSession(input) {
     && (f.id !== 'giri' || dinamici >= 3)
     && (f.id !== 'piramide' || dinamici >= 2))
   const pool = eligible.filter((f) => f.id !== prev)
-  const format = rng.pick(pool.length ? pool : eligible)
-  const main = format.build({ minuti: mMin, esercizi: block, level: levelOf('generale'), rng, leggera })
+
+  // Dopo un aumento di peso dei manubri, prudenza sul formato solo se li si usa davvero.
+  const prudenza = (levels.manubriPrudenza ?? 0) > 0 && block.some((e) => e.attrezzo === 'manubri')
+  const livelloFormato = clamp(levelOf('generale') - (prudenza ? RULES.WEIGHT_CAUTION_LEVELS : 0))
+
+  // Si prova un formato alla volta e si tiene il primo che sta nel budget (±10%):
+  // un formato a ripetizioni con esercizi veloci puo' non riuscire a riempirlo.
+  const budget = mMin * 60
+  const fits = (steps) => Math.abs(estimateSec(steps) - budget) <= budget * 0.1
+  let format = null
+  let main = null
+  for (const f of [...rng.shuffle(pool.length ? pool : eligible), FORMATS[0]]) {
+    const steps = f.build({ minuti: mMin, esercizi: block, level: livelloFormato, rng, leggera })
+    if (fits(steps) || f === FORMATS[0]) {
+      format = f
+      main = steps
+      break
+    }
+  }
 
   const steps = [
     ...warmup({ rng, minuti: wMin, block, allowed }),
@@ -167,7 +206,9 @@ export function generateSession(input) {
     formatoId: format.id,
     leggera,
     seed,
+    livelloFormato,
     steps,
     esercizi,
+    ...(avviso ? { avviso } : {}),
   }
 }

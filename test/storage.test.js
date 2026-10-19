@@ -73,3 +73,10 @@ test('storage: storico dal piu\' recente, al massimo 500', () => {
   assert.equal(st.history.length, 500)
   assert.equal(st.history[0].sessionId, 's509')
 })
+
+test('storage: save dice se il salvataggio e\' riuscito (codex #3)', () => {
+  assert.equal(createStore(memory()).save(createStore(memory()).load()), true)
+  const pieno = { getItem: () => null, setItem() { throw new Error('QuotaExceededError') }, removeItem() {} }
+  const store = createStore(pieno)
+  assert.equal(store.save(store.load()), false)
+})

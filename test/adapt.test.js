@@ -64,8 +64,13 @@ test('adapt: puro, non modifica l\'input', () => {
   assert.deepEqual(l, defaultLevels())
 })
 
-test('adapt: peso dei manubri aumentato abbassa i movimenti di forza', () => {
+test('adapt: peso dei manubri non tocca corpo libero e trave (codex #4)', () => {
   const l = onWeightChange(defaultLevels(), 10, 12)
-  assert.deepEqual([l.gambe, l.anca, l.spinta, l.trazione, l.core, l.cardio], [2, 2, 2, 2, 4, 4])
-  assert.deepEqual(onWeightChange(defaultLevels(), 10, 8), defaultLevels())
+  assert.deepEqual([l.gambe, l.anca, l.spinta, l.trazione, l.generale], [4, 4, 4, 4, 4])
+  assert.equal(l.manubriPrudenza, 3)
+  assert.equal(onWeightChange(defaultLevels(), 10, 8).manubriPrudenza ?? 0, 0)
+  const dopo = applyVote(l, { esercizi: ['goblet-squat'], leggera: false }, 'faticosa', [])
+  assert.equal(dopo.manubriPrudenza, 2)
+  const senzaManubri = applyVote(l, { esercizi: ['squat'], leggera: false }, 'faticosa', [])
+  assert.equal(senzaManubri.manubriPrudenza, 3)
 })

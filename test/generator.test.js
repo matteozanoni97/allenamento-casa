@@ -158,3 +158,48 @@ test('generator: escludere tutto il core lascia una sessione nel budget (review 
     assert.ok(Math.abs(secOf(main) - 12 * 60) <= 72)
   }
 })
+
+test('generator: budget del blocco rispettato su tutta la matrice (codex #1)', () => {
+  const fuori = []
+  for (const durataMin of [15, 20, 30, 45]) {
+    for (const manubri of [false, true]) {
+      for (const trave of [false, true]) {
+        for (const focus of ['tutto', 'gambe', 'alto', 'core']) {
+          for (let seed = 600; seed <= 640; seed++) {
+            const s = generateSession(base({ durataMin, seed, attrezzi: { manubri, trave }, pers: { focus }, levels: LV(4) }))
+            const m = RULES.SPLIT[durataMin][1] * 60
+            const est = secOf(s.steps.filter((x) => x.fase === 'blocco' || x.fase === 'pausa'))
+            if (Math.abs(est - m) > m * 0.1) fuori.push(`${durataMin}/${manubri}/${trave}/${focus}/${seed}: ${s.formatoId} ${est}s`)
+          }
+        }
+      }
+    }
+  }
+  assert.deepEqual(fuori, [])
+})
+
+test('generator: troppe esclusioni non svuotano il blocco (codex #2)', () => {
+  const tutti = CATALOG.filter((e) => e.ruolo === 'blocco').map((e) => e.id)
+  const s = generateSession(base({ durataMin: 15, pers: { escludi: tutti } }))
+  assert.ok(new Set(blockIds(s)).size >= 2)
+  assert.match(s.avviso, /esclus/i)
+  const soloGambe = CATALOG.filter((e) => e.ruolo === 'blocco' && e.movimento !== 'gambe').map((e) => e.id)
+  for (let seed = 1; seed <= 10; seed++) {
+    const g = generateSession(base({ seed, pers: { escludi: soloGambe } }))
+    // Il blocco ne ha almeno MIN_BLOCK; la piramide ne usa 2 per scelta.
+    assert.ok(new Set(blockIds(g)).size >= 2, `seed ${seed}: ${blockIds(g)}`)
+    if (g.formatoId !== 'piramide') assert.ok(new Set(blockIds(g)).size >= 3, `seed ${seed}: ${blockIds(g)}`)
+    assert.ok(blockIds(g).every((id) => byId(id).movimento === 'gambe'))
+    assert.equal(g.avviso, undefined)
+  }
+})
+
+test('generator: prudenza dopo manubri piu\' pesanti solo se ci sono manubri (codex #4)', () => {
+  const levels = { ...LV(7), manubriPrudenza: 3 }
+  const conManubri = generateSession(base({ seed: 5, levels, attrezzi: { manubri: true, trave: false } }))
+  const senza = generateSession(base({ seed: 5, levels, attrezzi: { manubri: false, trave: false } }))
+  const usaManubri = conManubri.esercizi.some((id) => byId(id).attrezzo === 'manubri')
+  assert.ok(usaManubri)
+  assert.equal(conManubri.livelloFormato, 5)
+  assert.equal(senza.livelloFormato, 7)
+})

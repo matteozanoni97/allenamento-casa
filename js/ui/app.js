@@ -40,6 +40,22 @@ let player = null
 let timer = null
 let prev = null
 let terminaArmed = null
+let salvataggioFallito = false
+
+// Unico punto in cui l'interfaccia salva: se il browser non lo permette, lo dice.
+function persist() {
+  salvataggioFallito = !store.save(state)
+  renderAvviso()
+}
+
+function renderAvviso() {
+  const msg = [
+    salvataggioFallito ? 'Non riesco a salvare i dati su questo browser: esporta un backup dallo storico.' : '',
+    session?.avviso ?? '',
+  ].filter(Boolean).join(' ')
+  $('avviso').textContent = msg
+  $('avviso').hidden = !msg
+}
 
 function show(id) {
   for (const s of document.querySelectorAll('.screen')) s.hidden = s.id !== id
@@ -63,6 +79,7 @@ function build() {
     now: new Date().toISOString(),
   })
   renderPreview($('anteprima'), session)
+  renderAvviso()
 }
 
 // --- Avvio ---
@@ -106,7 +123,7 @@ function start() {
   unlock()
   state.settings.durataMin = draft.durataMin
   state.settings.attrezzi = { ...draft.attrezzi }
-  store.save(state)
+  persist()
   build()
   player = createPlayer(session.steps, Date.now())
   prev = null
@@ -216,7 +233,7 @@ function finish(interrotta) {
     interrotta,
     levelsPrima: state.levels,
   })
-  store.save(state)
+  persist()
   renderVotes($('voti'), vote)
   show('fine')
 }
@@ -225,7 +242,7 @@ function vote(v) {
   const h = state.history[0]
   state.levels = applyVote(h.levelsPrima, { esercizi: h.esercizi, leggera: h.leggera }, v, h.saltati)
   state.history = [{ ...h, voto: v }, ...state.history.slice(1)]
-  store.save(state)
+  persist()
   draft.seed = newSeed()
   show('avvio')
   renderAvvio()
@@ -238,7 +255,7 @@ function renderStorico() {
     const h = state.history[0]
     state.levels = applyVote(h.levelsPrima, { esercizi: h.esercizi, leggera: h.leggera }, v, h.saltati)
     state.history = [{ ...h, voto: v }, ...state.history.slice(1)]
-    store.save(state)
+    persist()
     renderStorico()
   })
   $('peso').value = state.settings.pesoManubri
@@ -253,10 +270,10 @@ $('peso').addEventListener('change', (e) => {
   if (!(kg > 0)) { e.target.value = state.settings.pesoManubri; return }
   state.levels = onWeightChange(state.levels, state.settings.pesoManubri, kg)
   state.settings.pesoManubri = kg
-  store.save(state)
+  persist()
 })
-$('voce').addEventListener('change', (e) => { state.settings.voce = e.target.checked; store.save(state) })
-$('suoni').addEventListener('change', (e) => { state.settings.suoni = e.target.checked; store.save(state) })
+$('voce').addEventListener('change', (e) => { state.settings.voce = e.target.checked; persist() })
+$('suoni').addEventListener('change', (e) => { state.settings.suoni = e.target.checked; persist() })
 $('esporta').addEventListener('click', () => {
   const blob = new Blob([store.exportJson(state)], { type: 'application/json' })
   const a = document.createElement('a')
@@ -271,7 +288,7 @@ $('importa').addEventListener('change', async (e) => {
   if (!file) return
   try {
     state = store.importJson(await file.text())
-    store.save(state)
+    persist()
     $('msg-backup').textContent = `Backup importato: ${state.history.length} sessioni.`
     renderStorico()
   } catch (err) {

@@ -42,6 +42,12 @@ export const RULES = Object.freeze({
   }),
   LIGHT_INTERVALS: Object.freeze(['20:20', '30:30']),
 
+  // Esercizi minimi nel blocco centrale (i giri ne usano 3).
+  MIN_BLOCK: 3,
+  // Manubri piu' pesanti: per N sessioni coi manubri il formato scende di LEVELS livelli.
+  WEIGHT_CAUTION_SESSIONS: 3,
+  WEIGHT_CAUTION_LEVELS: 2,
+
   // Gradino massimo della scala di progressione raggiungibile a un livello.
   GRADINO_MAX: (level) => 1 + Math.floor((level - 1) / 3),
 })

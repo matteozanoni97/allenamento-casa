@@ -98,11 +98,11 @@ const piramide = {
   build(ctx) {
     const budget = ctx.minuti * 60
     const pool = dynamic(ctx.esercizi)
-    const list = pool.slice(0, Math.min(pool.length, ctx.rng.int(2, 3)))
+    const list = pool.slice(0, Math.min(pool.length, ctx.rng.int(2, 4)))
     const sumSpr = list.reduce((a, e) => a + e.secPerRep, 0)
     let best = null
-    for (let ripeti = 1; ripeti <= 4; ripeti++) {
-      for (let top = 4; top <= 20; top += 2) {
+    for (let ripeti = 1; ripeti <= 12; ripeti++) {
+      for (let top = 4; top <= 30; top += 2) {
         const sum = (top / 2) * (top / 2 + 1) // 2 + 4 + ... + top
         const diff = Math.abs(ripeti * sum * sumSpr - budget)
         if (!best || diff < best.diff) best = { ripeti, top, diff }

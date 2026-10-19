@@ -42,8 +42,14 @@ export function createStore(backend) {
   function safeGet(k) {
     try { return backend.getItem(k) } catch { return null }
   }
+  // Storage pieno o bloccato: niente eccezioni, ma l'esito torna al chiamante.
   function safeSet(k, v) {
-    try { backend.setItem(k, v) } catch { /* storage pieno o bloccato: si continua senza salvare */ }
+    try {
+      backend.setItem(k, v)
+      return true
+    } catch {
+      return false
+    }
   }
 
   function load() {
@@ -58,8 +64,9 @@ export function createStore(backend) {
     return defaults()
   }
 
+  // true se salvato; false se il browser non lo permette (la UI deve avvisare).
   function save(state) {
-    safeSet(KEY, JSON.stringify(normalize(state)))
+    return safeSet(KEY, JSON.stringify(normalize(state)))
   }
 
   function exportJson(state) {
