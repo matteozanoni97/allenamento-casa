@@ -17,6 +17,7 @@ test('catalog: campi validi', () => {
     assert.ok(ATTREZZI.includes(e.attrezzo), `${e.id} attrezzo`)
     assert.equal(typeof e.salto, 'boolean', `${e.id} salto`)
     assert.equal(typeof e.unilaterale, 'boolean', `${e.id} unilaterale`)
+    assert.equal(typeof e.isometrico, 'boolean', `${e.id} isometrico`)
     assert.ok(e.gradino >= 1 && e.gradino <= 4, `${e.id} gradino`)
     assert.ok(e.secPerRep > 0, `${e.id} secPerRep`)
     assert.ok(e.nome.trim().length > 0, `${e.id} nome`)
