@@ -34,18 +34,25 @@ test('formats: i formati a ripetizioni hanno il tempo limite sul primo step', ()
   for (const f of ['giri', 'piramide']) {
     const steps = fmt(f).build(ctx(12))
     assert.equal(steps[0].capSec, 720)
-    assert.ok(steps.every((s) => s.tipo === 'ripetizioni' && s.reps > 0))
+    assert.ok(steps.every((s) => (s.tipo === 'ripetizioni' && s.reps > 0) || (s.tipo === 'tempo' && s.sec > 0)))
   }
 })
 
-test('formats: niente isometrici nei formati a ripetizioni', () => {
+test('formats: isometrici come tenute a tempo nei formati a ripetizioni', () => {
   assert.equal(byId('plank').isometrico, true)
+  let conPlank = 0
   for (const f of ['giri', 'piramide']) {
-    for (let seed = 1; seed <= 10; seed++) {
+    for (let seed = 1; seed <= 30; seed++) {
       const steps = fmt(f).build(ctx(20, { rng: createRng(seed) }))
-      assert.ok(steps.every((s) => !byId(s.esercizioId).isometrico), f)
+      for (const st of steps.filter((x) => byId(x.esercizioId).isometrico)) {
+        conPlank++
+        assert.equal(st.tipo, 'tempo', f)
+        assert.ok(st.sec >= 5, `${f}: ${st.sec}`)
+      }
+      for (const st of steps.filter((x) => !byId(x.esercizioId).isometrico)) assert.equal(st.tipo, 'ripetizioni')
     }
   }
+  assert.ok(conPlank > 0, 'il plank deve poter comparire')
 })
 
 test('formats: intervalli senza due movimenti uguali consecutivi', () => {

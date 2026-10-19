@@ -164,13 +164,10 @@ export function generateSession(input) {
     rng, allowed, allowedSenzaEsclusioni, levelOf, focus: pers.focus ?? 'tutto', includi: pers.includi ?? [], recent, skipped: skippedOften(history),
   })
 
-  const dinamici = block.filter((e) => !e.isometrico).length
-  // Un isometrico fissato dall'utente sparirebbe nei formati a ripetizioni.
-  const isoFissato = (pers.includi ?? []).some((id) => byId(id)?.isometrico && block.some((e) => e.id === id))
   const prev = history[0]?.formatoId
   const eligible = FORMATS.filter((f) => f.minMin <= mMin
-    && (f.id !== 'giri' || (dinamici >= 3 && !isoFissato))
-    && (f.id !== 'piramide' || (dinamici >= 2 && !isoFissato)))
+    && (f.id !== 'giri' || block.length >= 3)
+    && (f.id !== 'piramide' || block.length >= 2))
   const pool = eligible.filter((f) => f.id !== prev)
 
   // Dopo un aumento di peso dei manubri, prudenza sul formato solo se li si usa davvero.

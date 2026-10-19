@@ -40,11 +40,20 @@ function timedBlock(list, [work, rest], sec, blocco) {
   return steps
 }
 
-// Esercizi a ripetizioni: niente isometrici, e mai la trave in testa (dita fredde).
-const dynamic = (esercizi) => {
-  const list = esercizi.filter((e) => !e.isometrico)
-  const i = list.findIndex((e) => e.attrezzo !== 'trave')
-  return i > 0 ? [...list.slice(i), ...list.slice(0, i)] : list
+// Formati a ripetizioni: mai la trave in testa (dita fredde).
+const repList = (esercizi) => {
+  const i = esercizi.findIndex((e) => e.attrezzo !== 'trave')
+  return i > 0 ? [...esercizi.slice(i), ...esercizi.slice(0, i)] : esercizi
+}
+
+// Gli isometrici diventano tenute a tempo proporzionate alle ripetizioni del giro.
+const secPerRep = (e) => (e.isometrico ? RULES.ISO_SEC_PER_REP : e.secPerRep)
+function repStep(e, reps, giro) {
+  if (e.isometrico) {
+    const sec = Math.max(RULES.ISO_MIN_SEC, Math.round(reps * RULES.ISO_SEC_PER_REP))
+    return { fase: 'blocco', tipo: 'tempo', sec, esercizioId: e.id, blocco: 1, giro }
+  }
+  return { fase: 'blocco', tipo: 'ripetizioni', reps, esercizioId: e.id, blocco: 1, giro }
 }
 
 const intervalli = {
@@ -81,15 +90,15 @@ const giri = {
   minMin: 0,
   build(ctx) {
     const budget = ctx.minuti * 60
-    const pool = dynamic(ctx.esercizi)
+    const pool = repList(ctx.esercizi)
     const list = pool.slice(0, Math.min(pool.length, ctx.rng.int(3, 4)))
     const reps0 = RULES.REPS[clampLevel(ctx.level - (ctx.leggera ? 1 : 0))]
-    const sumSpr = list.reduce((a, e) => a + e.secPerRep, 0)
+    const sumSpr = list.reduce((a, e) => a + secPerRep(e), 0)
     const rounds = Math.max(2, Math.round(budget / (reps0 * sumSpr)))
     const reps = Math.max(3, Math.round(budget / (rounds * sumSpr)))
     const steps = []
     for (let g = 1; g <= rounds; g++) {
-      for (const e of list) steps.push({ fase: 'blocco', tipo: 'ripetizioni', reps, esercizioId: e.id, blocco: 1, giro: g })
+      for (const e of list) steps.push(repStep(e, reps, g))
     }
     steps[0].capSec = budget
     return steps
@@ -102,9 +111,9 @@ const piramide = {
   minMin: 0,
   build(ctx) {
     const budget = ctx.minuti * 60
-    const pool = dynamic(ctx.esercizi)
+    const pool = repList(ctx.esercizi)
     const list = pool.slice(0, Math.min(pool.length, ctx.rng.int(2, 4)))
-    const sumSpr = list.reduce((a, e) => a + e.secPerRep, 0)
+    const sumSpr = list.reduce((a, e) => a + secPerRep(e), 0)
     let best = null
     for (let ripeti = 1; ripeti <= 12; ripeti++) {
       for (let top = 4; top <= 30; top += 2) {
@@ -118,7 +127,7 @@ const piramide = {
     for (let r = 0; r < best.ripeti; r++) {
       for (let reps = best.top; reps >= 2; reps -= 2) {
         giro++
-        for (const e of list) steps.push({ fase: 'blocco', tipo: 'ripetizioni', reps, esercizioId: e.id, blocco: 1, giro })
+        for (const e of list) steps.push(repStep(e, reps, giro))
       }
     }
     steps[0].capSec = budget

@@ -74,4 +74,6 @@ test('catalog: copertura per ogni combinazione di attrezzi', () => {
     assert.ok(def.some((e) => e.stretchFor.includes(m)), `stretching per ${m}`)
   }
   assert.ok(CATALOG.some((e) => e.ruolo === 'riscaldamento' && e.attrezzo === 'trave'), 'appeso a piedi a terra')
+  const coreTrave = CATALOG.filter((e) => e.ruolo === 'blocco' && e.movimento === 'core' && e.attrezzo === 'trave')
+  assert.ok(coreTrave.length >= 3, `addominali alla trave: ${coreTrave.length}`)
 })

@@ -93,6 +93,9 @@ export const CATALOG = Object.freeze([
   ex('russian-twist', 'Russian twist', B, 'core', 'corpo', 'Seduto, busto inclinato e piedi sollevati, ruota il busto da un lato all\'altro.', { secPerRep: 1.5, fedb: 'Russian_Twist' }),
   ex('flutter-kicks', 'Sforbiciate', B, 'core', 'corpo', 'Supino, gambe tese sollevate, piccoli colpi alternati con la schiena a terra.', { secPerRep: 1, fedb: 'Flutter_Kicks' }),
   ex('russian-twist-manubrio', 'Russian twist con manubrio', B, 'core', 'manubri', 'Come il russian twist, tenendo un manubrio al petto.', { secPerRep: 2 }),
+  ex('ginocchia-alternate-appeso', 'Ginocchia alternate da appeso', B, 'core', 'trave', `${TRAVE} Da appeso, porta un ginocchio alla volta verso il petto, senza dondolare.`, { secPerRep: 2 }),
+  ex('torsioni-appeso', 'Ginocchia con torsione da appeso', B, 'core', 'trave', `${TRAVE} Da appeso, porta le ginocchia al petto verso un fianco, poi verso l'altro.`, { secPerRep: 3 }),
+  ex('tenuta-ginocchia-appeso', 'Tenuta a ginocchia alte da appeso', B, 'core', 'trave', `${TRAVE} Da appeso, tieni le ginocchia sollevate all'altezza delle anche.`, { isometrico: true, secPerRep: 1 }),
   ex('ginocchia-appeso', 'Ginocchia al petto da appeso', B, 'core', 'trave', `${TRAVE} Da appeso, porta le ginocchia al petto senza dondolare.`, { secPerRep: 3, fedb: 'Hanging_Leg_Raise' }),
 
   // --- Cardio ---

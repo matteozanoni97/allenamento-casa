@@ -42,6 +42,10 @@ export const RULES = Object.freeze({
   }),
   LIGHT_INTERVALS: Object.freeze(['20:20', '30:30']),
 
+  // Isometrici (plank, sedia al muro, appesi) nei formati a ripetizioni: tenuta a tempo.
+  ISO_SEC_PER_REP: 2.5,
+  ISO_MIN_SEC: 10,
+
   // Esercizi minimi nel blocco centrale (i giri ne usano 3).
   MIN_BLOCK: 3,
   // Manubri piu' pesanti: per N sessioni coi manubri il formato scende di LEVELS livelli.

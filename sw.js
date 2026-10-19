@@ -4,7 +4,7 @@
 // Le immagini degli esercizi entrano in cache la prima volta che si vedono.
 // Alzare VERSION a ogni rilascio.
 
-const VERSION = 'v1'
+const VERSION = 'v2'
 const CACHE = `allenamento-${VERSION}`
 
 const PRECACHE = [
