@@ -13,7 +13,8 @@ export const RULES = Object.freeze({
 
   LEVEL_MIN: 1,
   LEVEL_MAX: 10,
-  LEVEL_START: 3,
+  // 4 = gradino 2 raggiungibile da subito (es. piegamenti normali, non sulle ginocchia).
+  LEVEL_START: 4,
   MOVEMENTS: Object.freeze(['gambe', 'anca', 'spinta', 'trazione', 'core', 'cardio']),
 
   // Varieta': esercizi del blocco da evitare se usati nelle ultime N sessioni.
