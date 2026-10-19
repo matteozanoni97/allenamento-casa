@@ -1,0 +1,12 @@
+{
+  "name": "allenamento-casa",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Allenamenti a casa a circuito: scegli durata e attrezzi, l'app genera la sessione e scandisce i tempi. PWA statica, senza dipendenze.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "serve": "python -m http.server 8090"
+  },
+  "license": "MIT"
+}
