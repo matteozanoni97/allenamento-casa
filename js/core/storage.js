@@ -1,0 +1,77 @@
+// Unico punto che legge e scrive i dati. Oggi il backend e' localStorage; domani si
+// sostituisce con uno che parla col server, e il resto dell'app non cambia.
+
+import { defaultLevels } from './adapt.js'
+
+export const KEY = 'allenamento-casa:v1'
+const SCHEMA = 1
+const MAX_HISTORY = 500
+
+function defaults() {
+  return {
+    schemaVersion: SCHEMA,
+    settings: { durataMin: 20, attrezzi: { manubri: false, trave: false }, pesoManubri: 10, voce: true, suoni: true },
+    levels: defaultLevels(),
+    history: [],
+  }
+}
+
+function isValid(st) {
+  return st && st.schemaVersion === SCHEMA
+    && st.settings && typeof st.settings === 'object'
+    && st.levels && typeof st.levels === 'object'
+    && Array.isArray(st.history)
+}
+
+// Completa uno stato valido con eventuali campi aggiunti dopo (stessa versione di schema).
+function normalize(st) {
+  const d = defaults()
+  return {
+    schemaVersion: SCHEMA,
+    settings: { ...d.settings, ...st.settings, attrezzi: { ...d.settings.attrezzi, ...st.settings.attrezzi } },
+    levels: { ...d.levels, ...st.levels, streak: { ...st.levels.streak } },
+    history: st.history.slice(0, MAX_HISTORY),
+  }
+}
+
+export function addHistory(state, entry) {
+  return { ...state, history: [entry, ...state.history].slice(0, MAX_HISTORY) }
+}
+
+export function createStore(backend) {
+  function safeGet(k) {
+    try { return backend.getItem(k) } catch { return null }
+  }
+  function safeSet(k, v) {
+    try { backend.setItem(k, v) } catch { /* storage pieno o bloccato: si continua senza salvare */ }
+  }
+
+  function load() {
+    const raw = safeGet(KEY)
+    if (raw == null) return defaults()
+    try {
+      const st = JSON.parse(raw)
+      if (isValid(st)) return normalize(st)
+    } catch { /* gestito sotto */ }
+    // Dato illeggibile o di una versione futura: non lo si cancella, lo si mette da parte.
+    safeSet(`${KEY}:corrotto`, raw)
+    return defaults()
+  }
+
+  function save(state) {
+    safeSet(KEY, JSON.stringify(normalize(state)))
+  }
+
+  function exportJson(state) {
+    return JSON.stringify(normalize(state), null, 2)
+  }
+
+  function importJson(text) {
+    let st
+    try { st = JSON.parse(text) } catch { throw new Error('File non valido: non è un JSON.') }
+    if (!isValid(st)) throw new Error('File non valido: non è un backup di Allenamento Casa.')
+    return normalize(st)
+  }
+
+  return { load, save, exportJson, importJson }
+}
