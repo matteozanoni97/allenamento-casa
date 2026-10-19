@@ -34,6 +34,22 @@ function normalize(st) {
   }
 }
 
+// Backend del browser: se localStorage non e' accessibile (origine bloccata o
+// sandbox), le scritture falliscono in modo esplicito invece di fingere di riuscire.
+export function browserBackend(getStorage) {
+  try {
+    const ls = getStorage()
+    ls.getItem('allenamento-casa:prova')
+    return ls
+  } catch {
+    return {
+      getItem: () => null,
+      setItem() { throw new Error('Archivio del browser non disponibile.') },
+      removeItem() {},
+    }
+  }
+}
+
 export function addHistory(state, entry) {
   return { ...state, history: [entry, ...state.history].slice(0, MAX_HISTORY) }
 }

@@ -6,7 +6,9 @@ PWA statica per allenamenti a casa a circuito. Uso personale di Matteo.
   **Principi con fonte:** `docs/principi-sessione.md` (copia; l'originale vive nel
   brain in `PERSONALE - WORKSPACE/Allenamento/`).
 - **Nucleo puro** in `js/core/` (nessun accesso a DOM o `localStorage`, tranne
-  `storage.js` che riceve il backend come parametro). Tutto testato con `node --test`.
+  `storage.js` che riceve il backend come parametro). Tutto testato con `npm test`
+  (solo `test/`). Lo smoke test nel browser e' a parte: `npm run serve` e poi
+  `node tools/smoke-test.mjs`.
 - **Numeri e soglie solo in `js/core/rules.js`.** Cambiarne uno = cambiare una regola:
   aggiornare anche `docs/principi-sessione.md` se la motivazione cambia.
 - **UI** in `js/ui/`: schermate, voce, bip, wake lock. Ogni API del browser degrada

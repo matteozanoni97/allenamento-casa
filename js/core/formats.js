@@ -40,7 +40,12 @@ function timedBlock(list, [work, rest], sec, blocco) {
   return steps
 }
 
-const dynamic = (esercizi) => esercizi.filter((e) => !e.isometrico)
+// Esercizi a ripetizioni: niente isometrici, e mai la trave in testa (dita fredde).
+const dynamic = (esercizi) => {
+  const list = esercizi.filter((e) => !e.isometrico)
+  const i = list.findIndex((e) => e.attrezzo !== 'trave')
+  return i > 0 ? [...list.slice(i), ...list.slice(0, i)] : list
+}
 
 const intervalli = {
   id: 'intervalli',

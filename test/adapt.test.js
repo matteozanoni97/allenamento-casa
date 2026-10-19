@@ -74,3 +74,14 @@ test('adapt: peso dei manubri non tocca corpo libero e trave (codex #4)', () => 
   const senzaManubri = applyVote(l, { esercizi: ['squat'], leggera: false }, 'faticosa', [])
   assert.equal(senzaManubri.manubriPrudenza, 3)
 })
+
+test('adapt: rivotare conserva la prudenza sui manubri impostata dopo (codex finale #5)', async () => {
+  const { revote } = await import('../js/core/adapt.js')
+  const prima = defaultLevels()
+  const sessione = { esercizi: ['squat', 'piegamenti'], leggera: false }
+  const dopoVoto = applyVote(prima, sessione, 'giusta', [])
+  const dopoPeso = onWeightChange(dopoVoto, 10, 14)
+  const r = revote(dopoPeso, prima, sessione, 'facile', [])
+  assert.equal(r.manubriPrudenza, 3)
+  assert.equal(r.gambe, 5)
+})

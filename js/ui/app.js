@@ -3,8 +3,8 @@
 import { RULES } from '../core/rules.js'
 import { CATALOG, byId } from '../core/catalog.js'
 import { generateSession } from '../core/generator.js'
-import { applyVote, onWeightChange } from '../core/adapt.js'
-import { createStore, addHistory } from '../core/storage.js'
+import { revote, onWeightChange } from '../core/adapt.js'
+import { createStore, addHistory, browserBackend } from '../core/storage.js'
 import { createPlayer } from '../core/player.js'
 import { parseDeepLink } from './deeplink.js'
 import { unlock, speak, beep, keepAwake } from './cues.js'
@@ -14,16 +14,7 @@ import {
 
 const $ = (id) => document.getElementById(id)
 
-const backend = (() => {
-  try {
-    const ls = window.localStorage
-    ls.getItem('x')
-    return ls
-  } catch {
-    return { getItem: () => null, setItem() {}, removeItem() {} }
-  }
-})()
-const store = createStore(backend)
+const store = createStore(browserBackend(() => window.localStorage))
 let state = store.load()
 
 const newSeed = () => (Date.now() ^ Math.floor(Math.random() * 2 ** 30)) >>> 0
@@ -240,7 +231,7 @@ function finish(interrotta) {
 
 function vote(v) {
   const h = state.history[0]
-  state.levels = applyVote(h.levelsPrima, { esercizi: h.esercizi, leggera: h.leggera }, v, h.saltati)
+  state.levels = revote(state.levels, h.levelsPrima, { esercizi: h.esercizi, leggera: h.leggera }, v, h.saltati)
   state.history = [{ ...h, voto: v }, ...state.history.slice(1)]
   persist()
   draft.seed = newSeed()
@@ -253,7 +244,7 @@ function vote(v) {
 function renderStorico() {
   renderHistory($('lista-storico'), state.history, (v) => {
     const h = state.history[0]
-    state.levels = applyVote(h.levelsPrima, { esercizi: h.esercizi, leggera: h.leggera }, v, h.saltati)
+    state.levels = revote(state.levels, h.levelsPrima, { esercizi: h.esercizi, leggera: h.leggera }, v, h.saltati)
     state.history = [{ ...h, voto: v }, ...state.history.slice(1)]
     persist()
     renderStorico()

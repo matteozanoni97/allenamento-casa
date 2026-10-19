@@ -203,3 +203,27 @@ test('generator: prudenza dopo manubri piu\' pesanti solo se ci sono manubri (co
   assert.equal(conManubri.livelloFormato, 5)
   assert.equal(senza.livelloFormato, 7)
 })
+
+test('generator: trave mai prima anche nei formati a ripetizioni (codex finale #2)', () => {
+  const s = generateSession(base({ durataMin: 15, seed: 142, levels: LV(4), attrezzi: { manubri: false, trave: true } }))
+  assert.notEqual(byId(blockIds(s)[0]).attrezzo, 'trave', `${s.formatoId}: ${blockIds(s)}`)
+  for (let seed = 1; seed <= 200; seed++) {
+    const x = generateSession(base({ durataMin: 15, seed, levels: LV(4), attrezzi: { manubri: false, trave: true } }))
+    assert.notEqual(byId(blockIds(x)[0]).attrezzo, 'trave', `seed ${seed} ${x.formatoId}`)
+  }
+})
+
+test('generator: esercizio isometrico fissato resta nel circuito (codex finale #3)', () => {
+  for (let seed = 1; seed <= 20; seed++) {
+    const s = generateSession(base({ seed, pers: { includi: ['plank'] }, attrezzi: { manubri: false, trave: false } }))
+    assert.ok(blockIds(s).includes('plank'), `seed ${seed} ${s.formatoId}`)
+  }
+})
+
+test('generator: con due soli esercizi ammessi si completa fino al minimo con avviso (codex finale #6)', () => {
+  const tieni = new Set(['squat', 'piegamenti'])
+  const escludi = CATALOG.filter((e) => e.ruolo === 'blocco' && !tieni.has(e.id)).map((e) => e.id)
+  const s = generateSession(base({ levels: LV(4), pers: { escludi } }))
+  assert.match(s.avviso ?? '', /esclus/i)
+  assert.ok(new Set(s.esercizi).size >= 2)
+})

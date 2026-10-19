@@ -57,6 +57,17 @@ export function applyVote(levels, session, voto, saltati) {
   return out
 }
 
+// Voto (o voto corretto) dell'ultima sessione: si riparte dai livelli di prima della
+// sessione, ma la prudenza sui manubri resta quella attuale (puo' essere cambiata dopo).
+export function revote(current, levelsPrima, session, voto, saltati) {
+  const out = applyVote(levelsPrima, session, voto, saltati)
+  const prudenzaPrima = levelsPrima.manubriPrudenza ?? 0
+  const consumata = prudenzaPrima - (out.manubriPrudenza ?? 0)
+  const attuale = current.manubriPrudenza ?? 0
+  out.manubriPrudenza = attuale > prudenzaPrima ? attuale : Math.max(0, prudenzaPrima - consumata)
+  return out
+}
+
 // Manubri piu' pesanti: per qualche sessione coi manubri il formato riparte prudente
 // (vedi generator). Corpo libero e trave non cambiano.
 export function onWeightChange(levels, oldKg, newKg) {

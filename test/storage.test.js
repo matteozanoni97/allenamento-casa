@@ -80,3 +80,13 @@ test('storage: save dice se il salvataggio e\' riuscito (codex #3)', () => {
   const store = createStore(pieno)
   assert.equal(store.save(store.load()), false)
 })
+
+test('storage: backend del browser non disponibile segnala il salvataggio fallito (codex finale #4)', async () => {
+  const { browserBackend } = await import('../js/core/storage.js')
+  const b = browserBackend(() => { throw new Error('SecurityError') })
+  assert.equal(b.getItem('x'), null)
+  const store = createStore(b)
+  assert.equal(store.save(store.load()), false)
+  const ok = browserBackend(() => memory())
+  assert.equal(createStore(ok).save(createStore(ok).load()), true)
+})
