@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Allenamento Casa</title>
+  <meta name="description" content="Allenamenti a casa a circuito: scegli durata e attrezzi, l'app genera la sessione e scandisce i tempi.">
+  <meta name="theme-color" content="#2E4B3C">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="./css/style.css">
+  <script type="module" src="./js/ui/app.js"></script>
+</head>
+<body>
+  <!-- Avvio -->
+  <main id="avvio" class="screen light">
+    <header class="top">
+      <h1>Allenamento Casa</h1>
+      <button id="apri-storico" class="ghost" type="button">Storico</button>
+    </header>
+
+    <section aria-labelledby="t-durata">
+      <h2 id="t-durata" class="eyebrow">Quanto tempo hai</h2>
+      <div id="durate" class="seg" role="group" aria-labelledby="t-durata"></div>
+    </section>
+
+    <section aria-labelledby="t-attrezzi">
+      <h2 id="t-attrezzi" class="eyebrow">Attrezzi</h2>
+      <div class="toggles">
+        <label class="toggle"><input type="checkbox" id="att-manubri"><span>Manubri <small id="peso-label"></small></span></label>
+        <label class="toggle"><input type="checkbox" id="att-trave"><span>Trave</span></label>
+      </div>
+    </section>
+
+    <details id="personalizza">
+      <summary>Personalizza</summary>
+      <fieldset>
+        <legend>Come ti senti oggi</legend>
+        <div class="seg" id="umore"></div>
+      </fieldset>
+      <fieldset>
+        <legend>Cosa allenare</legend>
+        <div class="seg" id="focus"></div>
+      </fieldset>
+      <label class="toggle"><input type="checkbox" id="senza-salti"><span>Senza salti</span></label>
+      <fieldset>
+        <legend>Esercizi</legend>
+        <p class="hint">Scegli "sempre" per includerlo, "mai" per escluderlo.</p>
+        <ul id="scelta-esercizi" class="ex-list"></ul>
+      </fieldset>
+    </details>
+
+    <section id="anteprima" class="preview" aria-live="polite"></section>
+
+    <div class="bottom-bar">
+      <button id="rigenera" class="secondary" type="button">Rigenera</button>
+      <button id="via" class="primary" type="button">Via</button>
+    </div>
+  </main>
+
+  <!-- Sessione -->
+  <main id="sessione" class="screen dark" hidden>
+    <div class="phasebar"><span id="fase-nome"></span><span id="fase-info"></span></div>
+    <div class="progress" aria-hidden="true"><span id="progresso"></span></div>
+    <div class="stage">
+      <div id="numero" class="big" aria-live="off"></div>
+      <h2 id="es-nome" class="ex-name"></h2>
+      <p id="es-trave" class="warn" hidden>Prese ampie, mano aperta</p>
+      <img id="es-img" alt="" hidden>
+      <p id="es-istruzione" class="instr"></p>
+      <p id="es-poi" class="next"></p>
+    </div>
+    <div class="controls">
+      <button id="pausa" type="button" class="ctl">Pausa</button>
+      <button id="salta" type="button" class="ctl">Salta</button>
+      <button id="fatto" type="button" class="ctl primary" hidden>Fatto</button>
+      <button id="termina" type="button" class="ctl ghost-dark">Termina</button>
+    </div>
+  </main>
+
+  <!-- Fine -->
+  <main id="fine" class="screen light" hidden>
+    <h1>Com'è andata?</h1>
+    <div id="voti" class="votes"></div>
+    <p class="hint">Puoi cambiare il voto più tardi dallo storico.</p>
+  </main>
+
+  <!-- Storico e impostazioni -->
+  <main id="storico" class="screen light" hidden>
+    <header class="top">
+      <h1>Storico</h1>
+      <button id="chiudi-storico" class="ghost" type="button">Indietro</button>
+    </header>
+    <ul id="lista-storico" class="history"></ul>
+
+    <h2 class="eyebrow">Impostazioni</h2>
+    <label class="field">Peso dei manubri (kg)
+      <input id="peso" type="number" min="1" max="50" step="0.5" inputmode="decimal">
+    </label>
+    <label class="toggle"><input type="checkbox" id="voce"><span>Voce</span></label>
+    <label class="toggle"><input type="checkbox" id="suoni"><span>Segnali sonori</span></label>
+
+    <h2 class="eyebrow">Backup</h2>
+    <div class="row">
+      <button id="esporta" class="secondary" type="button">Esporta</button>
+      <label class="secondary as-button">Importa<input id="importa" type="file" accept="application/json,.json" hidden></label>
+    </div>
+    <p id="msg-backup" class="hint" role="status"></p>
+    <p class="hint credits">Immagini da free-exercise-db (pubblico dominio).</p>
+  </main>
+</body>
+</html>
