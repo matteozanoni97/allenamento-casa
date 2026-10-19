@@ -14,6 +14,7 @@ const ex = (id, nome, ruolo, movimento, attrezzo, istruzione, o = {}) => ({
   salto: o.salto ?? false,
   unilaterale: o.unilaterale ?? false,
   isometrico: o.isometrico ?? false,
+  tecnico: o.tecnico ?? false,
   scala: o.scala ?? null,
   gradino: o.gradino ?? 1,
   secPerRep: o.secPerRep ?? 3,
@@ -50,10 +51,10 @@ export const CATALOG = Object.freeze([
   ex('ponte-una-gamba', 'Ponte su una gamba', B, 'anca', 'corpo', 'Come il ponte, con una gamba tesa in aria. Alterna i lati.', { scala: 'ponte', gradino: 2, unilaterale: true, fedb: 'Single_Leg_Glute_Bridge' }),
   ex('ponte-pausa-una-gamba', 'Ponte su una gamba con pausa', B, 'anca', 'corpo', 'Ponte su una gamba, tieni 2 secondi in alto a ogni ripetizione.', { scala: 'ponte', gradino: 3, unilaterale: true, secPerRep: 4 }),
   ex('superman', 'Superman', B, 'anca', 'corpo', 'Prono, solleva insieme braccia e gambe tese, tieni un attimo e scendi.', { fedb: 'Superman' }),
-  ex('stacco-una-gamba', 'Stacco su una gamba', B, 'anca', 'corpo', 'Su una gamba, busto avanti e gamba dietro in linea, schiena dritta.', { unilaterale: true, secPerRep: 3.5 }),
+  ex('stacco-una-gamba', 'Stacco su una gamba', B, 'anca', 'corpo', 'Su una gamba, busto avanti e gamba dietro in linea, schiena dritta.', { tecnico: true, unilaterale: true, secPerRep: 3.5 }),
   ex('kickback', 'Slancio dietro in quadrupedia', B, 'anca', 'corpo', 'A quattro zampe, spingi un tallone verso il soffitto, alterna.', { unilaterale: true, secPerRep: 2, fedb: 'Glute_Kickback' }),
   ex('stacco-rumeno-manubri', 'Stacco rumeno con manubri', B, 'anca', 'manubri', 'Manubri davanti alle cosce, bacino indietro e schiena dritta, risali stringendo i glutei.', { fedb: 'Stiff-Legged_Dumbbell_Deadlift' }),
-  ex('swing-manubrio', 'Swing con manubrio', B, 'anca', 'manubri', 'Un manubrio a due mani, spinta d\'anca esplosiva fino al petto.', { secPerRep: 2, fedb: 'Vertical_Swing' }),
+  ex('swing-manubrio', 'Swing con manubrio', B, 'anca', 'manubri', 'Un manubrio a due mani, spinta d\'anca esplosiva fino al petto.', { tecnico: true, secPerRep: 2, fedb: 'Vertical_Swing' }),
   ex('hip-thrust-manubrio', 'Ponte con manubrio', B, 'anca', 'manubri', 'Ponte glutei con un manubrio appoggiato sul bacino.', { secPerRep: 2.5 }),
 
   // --- Spinta ---
@@ -63,11 +64,11 @@ export const CATALOG = Object.freeze([
   ex('piegamenti-esplosivi', 'Piegamenti esplosivi', B, 'spinta', 'corpo', 'Piegamento con spinta veloce che stacca le mani da terra.', { scala: 'piegamenti', gradino: 4, fedb: 'Plyo_Push-up' }),
   ex('piegamenti-inclinati', 'Piegamenti inclinati', B, 'spinta', 'corpo', 'Mani su letto o divano, corpo dritto, petto verso il bordo.', { secPerRep: 2.5, fedb: 'Incline_Push-Up' }),
   ex('dip-sedia', 'Dip su sedia', B, 'spinta', 'corpo', 'Mani sul bordo di una sedia stabile dietro di te, scendi piegando i gomiti.', { fedb: 'Bench_Dips' }),
-  ex('piegamento-plank-laterale', 'Piegamento e plank laterale', B, 'spinta', 'corpo', 'Un piegamento, poi ruota in plank laterale col braccio al soffitto. Alterna.', { secPerRep: 4, fedb: 'Push_Up_to_Side_Plank' }),
-  ex('pike-push-up', 'Piegamenti a V', B, 'spinta', 'corpo', 'Bacino alto a V rovesciata, testa verso terra tra le mani, spingi su.', { gradino: 1, secPerRep: 3 }),
+  ex('piegamento-plank-laterale', 'Piegamento e plank laterale', B, 'spinta', 'corpo', 'Un piegamento, poi ruota in plank laterale col braccio al soffitto. Alterna.', { tecnico: true, secPerRep: 4, fedb: 'Push_Up_to_Side_Plank' }),
+  ex('pike-push-up', 'Piegamenti a V', B, 'spinta', 'corpo', 'Bacino alto a V rovesciata, testa verso terra tra le mani, spingi su.', { tecnico: true, gradino: 1, secPerRep: 3 }),
   ex('spinta-manubri', 'Spinta sopra la testa', B, 'spinta', 'manubri', 'In piedi, manubri alle spalle, spingi in alto senza inarcare la schiena.', { fedb: 'Standing_Dumbbell_Press' }),
   ex('floor-press', 'Distensioni a terra', B, 'spinta', 'manubri', 'Supino, manubri sopra il petto, scendi finché i gomiti toccano terra.', { fedb: 'Dumbbell_Floor_Press' }),
-  ex('thruster', 'Thruster', B, 'spinta', 'manubri', 'Squat coi manubri alle spalle e, risalendo, spingi sopra la testa.', { secPerRep: 3.5 }),
+  ex('thruster', 'Thruster', B, 'spinta', 'manubri', 'Squat coi manubri alle spalle e, risalendo, spingi sopra la testa.', { tecnico: true, secPerRep: 3.5 }),
 
   // --- Trazione ---
   ex('angelo-inverso', 'Angelo nella neve prono', B, 'trazione', 'corpo', 'Prono, braccia sollevate da terra, disegna un arco dai fianchi sopra la testa.', { secPerRep: 3 }),
@@ -75,7 +76,7 @@ export const CATALOG = Object.freeze([
   ex('rematore-manubri', 'Rematore con manubri', B, 'trazione', 'manubri', 'Busto inclinato e schiena dritta, tira i manubri verso i fianchi.', { fedb: 'Bent_Over_Two-Dumbbell_Row' }),
   ex('rematore-una-mano', 'Rematore a un braccio', B, 'trazione', 'manubri', 'Mano libera appoggiata sul ginocchio, tira il manubrio verso l\'anca. Alterna.', { unilaterale: true, fedb: 'One-Arm_Dumbbell_Row' }),
   ex('alzate-posteriori', 'Alzate posteriori', B, 'trazione', 'manubri', 'Busto inclinato, apri le braccia di lato fino all\'altezza delle spalle.', { fedb: 'Reverse_Flyes' }),
-  ex('renegade-row', 'Rematore in plank', B, 'trazione', 'manubri', 'In plank sui manubri, tira un manubrio al fianco senza ruotare il bacino. Alterna.', { unilaterale: true, secPerRep: 3.5, fedb: 'Alternating_Renegade_Row' }),
+  ex('renegade-row', 'Rematore in plank', B, 'trazione', 'manubri', 'In plank sui manubri, tira un manubrio al fianco senza ruotare il bacino. Alterna.', { tecnico: true, unilaterale: true, secPerRep: 3.5, fedb: 'Alternating_Renegade_Row' }),
   ex('appeso-attivo', 'Appeso attivo', B, 'trazione', 'trave', `${TRAVE} Braccia tese, abbassa le spalle lontano dalle orecchie e tieni.`, { isometrico: true, scala: 'trazioni-trave', gradino: 1, secPerRep: 1 }),
   ex('scapular-pull', 'Trazioni scapolari', B, 'trazione', 'trave', `${TRAVE} Braccia tese, solleva il corpo solo abbassando le scapole.`, { scala: 'trazioni-trave', gradino: 2, secPerRep: 2.5 }),
   ex('trazioni-negative', 'Trazioni negative', B, 'trazione', 'trave', `${TRAVE} Parti in alto (salendo da una sedia) e scendi lento in 4 secondi.`, { scala: 'trazioni-trave', gradino: 3, secPerRep: 6 }),
@@ -101,10 +102,10 @@ export const CATALOG = Object.freeze([
   // --- Cardio ---
   ex('mountain-climber', 'Mountain climber', B, 'cardio', 'corpo', 'In plank a braccia tese, porta le ginocchia al petto alternando, veloce.', { secPerRep: 1, fedb: 'Mountain_Climbers' }),
   ex('ginocchia-alte-marcia', 'Marcia a ginocchia alte', B, 'cardio', 'corpo', 'Sul posto, ginocchia all\'altezza delle anche e braccia che spingono, senza saltare.', { secPerRep: 1 }),
-  ex('burpee-senza-salto', 'Burpee senza salto', B, 'cardio', 'corpo', 'Mani a terra, passo indietro in plank, passo avanti e in piedi.', { secPerRep: 4 }),
+  ex('burpee-senza-salto', 'Burpee senza salto', B, 'cardio', 'corpo', 'Mani a terra, passo indietro in plank, passo avanti e in piedi.', { tecnico: true, secPerRep: 4 }),
   ex('shadow-boxing', 'Pugni in guardia', B, 'cardio', 'corpo', 'In guardia, pugni veloci alternati con rotazione del busto.', { secPerRep: 1 }),
   ex('jumping-jack', 'Jumping jack', B, 'cardio', 'corpo', 'Salta aprendo gambe e braccia, poi richiudi.', { salto: true, secPerRep: 1 }),
-  ex('burpee', 'Burpee', B, 'cardio', 'corpo', 'Squat, mani a terra, salta in plank, piegamento, torna su e salta.', { salto: true, secPerRep: 4 }),
+  ex('burpee', 'Burpee', B, 'cardio', 'corpo', 'Squat, mani a terra, salta in plank, piegamento, torna su e salta.', { tecnico: true, salto: true, secPerRep: 4 }),
   ex('corsa-sul-posto', 'Corsa sul posto', B, 'cardio', 'corpo', 'Corsa veloce sul posto, ginocchia alte.', { salto: true, secPerRep: 1, fedb: 'Fast_Skipping' }),
   ex('star-jump', 'Salto a stella', B, 'cardio', 'corpo', 'Da accosciato, salta aprendo braccia e gambe a stella.', { salto: true, secPerRep: 2.5, fedb: 'Star_Jump' }),
 
@@ -138,6 +139,12 @@ export const CATALOG = Object.freeze([
 ])
 
 const INDEX = new Map(CATALOG.map((e) => [e.id, e]))
+
+// Impegnativo = da fare a inizio circuito, da freschi: pliometrico (salto fuori dal
+// cardio leggero), gradino alto della scala o segnato come tecnico.
+export function isDemanding(e) {
+  return (e.salto && e.movimento !== 'cardio') || e.gradino >= 3 || e.tecnico
+}
 
 export function byId(id) {
   return INDEX.get(id)

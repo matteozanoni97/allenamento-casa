@@ -38,6 +38,8 @@ decisione nostra.
 | Formato di riferimento: 2 blocchi da 6 min con 2 min di pausa, 6 esercizi alternati | media | Agudo-Ortega 2026 |
 | Circuiti classici: pause di 15-30 s, 12-15 ripetizioni per stazione | bassa | Agudo-Ortega 2026 (introduzione) |
 | Lavorare vicino ma non fino al cedimento | media | Agudo-Ortega 2026, Helms 2020 |
+| Esercizi impegnativi (pliometrici, gradini alti, tecnici) a inizio circuito, da freschi | scelta di progetto | nessuna fonte letta; principio comune di programmazione |
+| Dopo una spinta, una trazione (coppia di antagonisti) quando il circuito ne ha | scelta di progetto | nessuna fonte letta |
 
 ## 3. Adattamento tra una sessione e l'altra
 

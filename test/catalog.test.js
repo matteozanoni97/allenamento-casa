@@ -18,6 +18,7 @@ test('catalog: campi validi', () => {
     assert.equal(typeof e.salto, 'boolean', `${e.id} salto`)
     assert.equal(typeof e.unilaterale, 'boolean', `${e.id} unilaterale`)
     assert.equal(typeof e.isometrico, 'boolean', `${e.id} isometrico`)
+    assert.equal(typeof e.tecnico, 'boolean', `${e.id} tecnico`)
     assert.ok(e.gradino >= 1 && e.gradino <= 4, `${e.id} gradino`)
     assert.ok(e.secPerRep > 0, `${e.id} secPerRep`)
     assert.ok(e.nome.trim().length > 0, `${e.id} nome`)
@@ -76,4 +77,10 @@ test('catalog: copertura per ogni combinazione di attrezzi', () => {
   assert.ok(CATALOG.some((e) => e.ruolo === 'riscaldamento' && e.attrezzo === 'trave'), 'appeso a piedi a terra')
   const coreTrave = CATALOG.filter((e) => e.ruolo === 'blocco' && e.movimento === 'core' && e.attrezzo === 'trave')
   assert.ok(coreTrave.length >= 3, `addominali alla trave: ${coreTrave.length}`)
+})
+
+test('catalog: cosa conta come impegnativo', async () => {
+  const { isDemanding } = await import('../js/core/catalog.js')
+  for (const id of ['jump-squat', 'burpee', 'thruster', 'squat-bulgaro', 'trazioni']) assert.ok(isDemanding(byId(id)), id)
+  for (const id of ['jumping-jack', 'corsa-sul-posto', 'squat', 'plank', 'mountain-climber']) assert.ok(!isDemanding(byId(id)), id)
 })

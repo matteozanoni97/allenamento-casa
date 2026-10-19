@@ -227,3 +227,44 @@ test('generator: con due soli esercizi ammessi si completa fino al minimo con av
   assert.match(s.avviso ?? '', /esclus/i)
   assert.ok(new Set(s.esercizi).size >= 2)
 })
+
+// Ordine del primo giro: prima comparsa di ogni esercizio del blocco.
+const primoGiro = (s) => [...new Set(blockIds(s))]
+
+test('generator: esercizi impegnativi in testa al circuito', async () => {
+  const { isDemanding } = await import('../js/core/catalog.js')
+  let casi = 0
+  for (let seed = 1; seed <= 150; seed++) {
+    const s = generateSession(base({ seed, levels: LV(7), attrezzi: { manubri: true, trave: true } }))
+    const ord = primoGiro(s).map(byId)
+    const esigentiNonTrave = ord.filter((e) => isDemanding(e) && e.attrezzo !== 'trave')
+    if (!esigentiNonTrave.length) continue
+    casi++
+    assert.ok(isDemanding(ord[0]), `seed ${seed}: primo ${ord[0].id}`)
+    // un esercizio facile prima di uno impegnativo e' ammesso solo se e' la trazione
+    // accoppiata alla spinta che la precede (o se la trave non poteva andare in testa)
+    ord.forEach((e, i) => {
+      if (isDemanding(e) || !ord.slice(i + 1).some((x) => isDemanding(x) && x.attrezzo !== 'trave')) return
+      assert.ok(e.movimento === 'trazione' && ord[i - 1]?.movimento === 'spinta', `seed ${seed}: ${ord.map((x) => x.id)}`)
+    })
+  }
+  assert.ok(casi > 30, `casi ${casi}`)
+})
+
+test('generator: dopo la spinta viene la trazione', () => {
+  let casi = 0
+  for (const focus of ['tutto', 'alto']) {
+    for (let seed = 1; seed <= 100; seed++) {
+      const s = generateSession(base({ seed, pers: { focus }, attrezzi: { manubri: true, trave: true } }))
+      const ord = primoGiro(s).map(byId)
+      ord.forEach((e, i) => {
+        if (e.movimento !== 'spinta') return
+        const restaTrazione = ord.slice(i + 1).some((x) => x.movimento === 'trazione')
+        if (!restaTrazione) return
+        casi++
+        assert.equal(ord[i + 1].movimento, 'trazione', `${focus}/${seed}: ${ord.map((x) => x.id)}`)
+      })
+    }
+  }
+  assert.ok(casi > 50, `casi ${casi}`)
+})

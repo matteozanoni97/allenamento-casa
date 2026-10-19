@@ -3,7 +3,7 @@
 // Le regole e le loro fonti sono in docs/principi-sessione.md.
 
 import { RULES } from './rules.js'
-import { CATALOG, byId } from './catalog.js'
+import { CATALOG, byId, isDemanding } from './catalog.js'
 import { FORMATS, estimateSec } from './formats.js'
 import { createRng } from './rng.js'
 
@@ -39,16 +39,24 @@ function topOfScale(list) {
   return list.filter((e) => !e.scala || e.gradino === best.get(e.scala))
 }
 
-// Ordina evitando due movimenti uguali vicini e la trave in testa.
+// Ordine del circuito, in ordine di priorita':
+//   1. mai due movimenti uguali vicini, mai la trave in testa;
+//   2. dopo una spinta, una trazione se ne resta una (coppia di antagonisti);
+//   3. prima gli esercizi impegnativi, da fare freschi.
 function order(list) {
   const rest = [...list]
   const out = []
   while (rest.length) {
     const last = out[out.length - 1]
-    let i = rest.findIndex((e) => (!last || e.movimento !== last.movimento) && (out.length > 0 || e.attrezzo !== 'trave'))
-    if (i < 0) i = rest.findIndex((e) => out.length > 0 || e.attrezzo !== 'trave')
-    if (i < 0) i = 0
-    out.push(rest.splice(i, 1)[0])
+    const okTesta = (e) => out.length > 0 || e.attrezzo !== 'trave'
+    let cands = rest.filter((e) => okTesta(e) && (!last || e.movimento !== last.movimento))
+    if (!cands.length) cands = rest.filter(okTesta)
+    if (!cands.length) cands = rest
+    const pick = (last?.movimento === 'spinta' && cands.find((e) => e.movimento === 'trazione'))
+      || cands.find(isDemanding)
+      || cands[0]
+    rest.splice(rest.indexOf(pick), 1)
+    out.push(pick)
   }
   return out
 }
@@ -177,7 +185,11 @@ export function generateSession(input) {
   // Si prova un formato alla volta e si tiene il primo che sta nel budget (±10%):
   // un formato a ripetizioni con esercizi veloci puo' non riuscire a riempirlo.
   const budget = mMin * 60
+  // Gli esercizi fissati dall'utente devono esserci: i formati a ripetizioni usano
+  // solo i primi della lista e potrebbero lasciarli fuori.
+  const fissati = (pers.includi ?? []).filter((id) => block.some((e) => e.id === id))
   const fits = (steps) => Math.abs(estimateSec(steps) - budget) <= budget * 0.1
+    && fissati.every((id) => steps.some((st) => st.esercizioId === id))
   let format = null
   let main = null
   for (const f of [...rng.shuffle(pool.length ? pool : eligible), FORMATS[0]]) {
